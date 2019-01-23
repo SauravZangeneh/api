@@ -36,12 +36,20 @@ def get_timestamp(title):
 	content = request.json
 	title=title.decode('utf8').replace("+"," ") #basic url parsing
 	if content:
-		docs[title][datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")]=content['content']
+		if title in docs:
+			#adds new timestamp
+			docs[title][datetime.datetime.now().replace(microsecond=0)]=content['content']
+		else:
+			#Creates new doc
+			docs[title]={}
+			docs[title][datetime.datetime.now().replace(microsecond=0)]=content['content']
 		print(docs)
-	if title in docs:
-		return jsonify(docs[title].keys())
+		return ("New content added")
 	else:
-		return ("Error doc doesn't exist")
+		if title in docs:
+			return jsonify(docs[title].keys())
+		else:
+			return ("Error doc doesn't exist")
 
 @app.route('/documents/<title>/<timestamp>', methods=['GET'])
 def get_content(title,timestamp):
