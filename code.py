@@ -59,5 +59,15 @@ def get_content(title,timestamp):
 	else:
 		return ("Error doc doesn't exist")
 
+
+@app.route('/documents/<title>/latest', methods=['GET','POST'])
+def get_latest(title,):
+	content = request.json
+	title=title.decode('utf8').replace("+"," ") #basic url parsing
+	if title in docs:
+		doc=docs[title]
+		return(doc[max(doc.keys())])
+	else:
+		return ("Error doc doesn't exist")
 app.run()
 
