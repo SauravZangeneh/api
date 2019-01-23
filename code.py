@@ -12,11 +12,11 @@ app = flask.Flask(__name__)
 
 
 docs ={'Test 1': 
-    	{datetime.datetime(2018, 1, 23, 20, 14, 8, 603536): 'oasidn',datetime.datetime(2013, 1, 23, 20, 14, 8, 603536): 'ajoj'},
+    	{datetime.datetime(2018, 1, 23, 20, 14, 8): 'oasidn',datetime.datetime(2013, 1, 23, 20, 14, 8): 'ajoj'},
     'Test 2': 
-    	{datetime.datetime(2018, 1, 23, 20, 14, 8, 603536):'asodn'},
+    	{datetime.datetime(2018, 1, 23, 20, 14, 8):'asodn'},
     'Test 3': 
-    	{datetime.datetime(2019, 1, 23, 20, 14, 8, 603536): 'snoan'}
+    	{datetime.datetime(2019, 1, 23, 20, 14, 8): 'snoan'}
     }
 
 
@@ -36,7 +36,7 @@ def get_timestamp(title):
 	content = request.json
 	title=title.decode('utf8').replace("+"," ") #basic url parsing
 	if content:
-		docs[title][datetime.datetime.now()]=content['content']
+		docs[title][datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")]=content['content']
 		print(docs)
 	if title in docs:
 		return jsonify(docs[title].keys())
@@ -50,10 +50,12 @@ def get_content(title,timestamp):
 	title=title.decode('utf8').replace("+"," ") #basic url parsing
 	if title in docs:
 		doc=docs[title]
-		timestamp=datetime.fromtimestamp(timestamp)
-		print(timestamp)
-		if timestamp in doc:
-			return doc[timestamp]
+		# have to enter actual timestamp - eg. 1516738448
+		timestamp=datetime.datetime.fromtimestamp(float(timestamp))
+		deltas=[timestamp-time for time in doc.keys() if timestamp>time]
+
+		#to return previous version doc
+		return (doc[timestamp-min(deltas)])
 	else:
 		return ("Error doc doesn't exist")
 
